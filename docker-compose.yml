@@ -1,0 +1,56 @@
+version: '3.8'
+
+services:
+    app:
+        build:
+            context: .
+            dockerfile: Dockerfile
+        image: blog-app
+        container_name: blog-app
+        ports:
+            - "8000:8000"
+        volumes:
+            - .:/var/www/html
+        environment:
+            - APP_ENV=local
+            - APP_DEBUG=true
+            - APP_KEY=base64:ipLFwrOhGsFovqMxUr/URDDHEJkc+/OcvlaJkghFuyo=
+            - DB_HOST=blog-db
+            - DB_PORT=3306
+            - DB_DATABASE=blog-db
+            - DB_USERNAME=ephraim
+            - DB_PASSWORD=123456
+        depends_on:
+            blog-db:
+                condition: service_healthy
+
+    blog-db:
+        image: mysql:8.0
+        container_name: blog-app-db
+        ports:
+            - "3306:3306"
+        environment:
+            MYSQL_DATABASE: blog-db
+            MYSQL_ROOT_PASSWORD: root
+            MYSQL_USER: ephraim
+            MYSQL_PASSWORD: 123456
+        volumes:
+            - db-data:/var/lib/mysql
+        healthcheck:
+            test: [ "CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "ephraim", "-p123456" ]
+            interval: 5s
+            timeout: 5s
+            retries: 5
+
+    artisan:
+        image: blog-app
+        container_name: blog-app-artisan
+        entrypoint: [ "php", "/var/www/html/artisan" ]
+        volumes:
+            - .:/var/www/html
+        depends_on:
+            blog-db:
+                condition: service_healthy
+
+volumes:
+    db-data:
