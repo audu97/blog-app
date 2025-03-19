@@ -14,19 +14,19 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
-        env:
-          DOCKER_TOKEN: ${{secrets.DOCKER_HUB_TOKEN}}
 
       - name: Set up Docker buildx
         uses: docker/setup-buildx-action@v2
 
       - name: log in to docker hub
-        run: echo"${{ secrets.DOCKER_HUB_TOKEN}}" | docker login -u "${{secrets.DOCKER_HUB_USERNAME}}" --password-stdin
+        run: echo "${{ secrets.DOCKER_HUB_TOKEN}}" | docker login -u "${{secrets.DOCKER_HUB_USERNAME}}" --password-stdin
 
       - name: Build and push the Docker image
         uses: docker/build-push-action@v4
         with:
           context: .
+          tags: ephraimaudu/blog-app
+          push: true
           file: Dockerfile
           cache-from: type=gha
           cache-to: type=gha,mode=max
