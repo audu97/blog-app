@@ -5,7 +5,7 @@ services:
         build:
             context: .
             dockerfile: Dockerfile
-        image: blog-app
+        image: ephraimaudu/blog-app
         container_name: blog-app
         ports:
             - "8000:8000"
